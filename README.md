@@ -20,6 +20,35 @@ The ALU is the muscles of the CPU. It doesn't "think"; it just does the math you
 - **Inputs:** `Operand A`, `Operand B`, `Opcode` (e.g., 0 for Add, 1 for Sub).
 - **Outputs:** `Result`, `Zero Flag` (tells us if the answer is 0).
 
+### 📝 Assignment 1: The ALU Specification
+
+**Objective:** Create a module named `alu` in `src/alu.v` that performs arithmetic and logic operations.
+
+### Port Definitions
+| Direction | Name | Width | Description |
+| :--- | :--- | :--- | :--- |
+| Input | `operand_a` | 8-bit | First number |
+| Input | `operand_b` | 8-bit | Second number |
+| Input | `opcode` | 3-bit | Selects the operation (see table below) |
+| Output | `result` | 8-bit | The output of the operation |
+| Output | `zero` | 1-bit | Should be **1** if `result` is 0, otherwise **0** |
+
+### Opcode Table (The Rules)
+Your ALU must support these 8 operations based on the `opcode` input:
+
+| Opcode (Binary) | Operation | Description |
+| :--- | :--- | :--- |
+| `000` | **ADD** | `result = operand_a + operand_b` |
+| `001` | **SUB** | `result = operand_a - operand_b` |
+| `010` | **AND** | `result = operand_a & operand_b` |
+| `011` | **OR** | `result = operand_a \| operand_b` |
+| `100` | **XOR** | `result = operand_a ^ operand_b` |
+| `101` | **NOT** | `result = ~operand_a` (Ignore operand_b) |
+| `110` | **SHL** | `result = operand_a << 1` (Shift Left by 1) |
+| `111` | **SHR** | `result = operand_a >> 1` (Shift Right by 1) |
+
+---
+
 ### 2. The Register File
 **The "Scratchpad"** 📝
 The CPU needs a fast place to write down numbers while working on them. This module is a small bank of memory cells (Registers).
