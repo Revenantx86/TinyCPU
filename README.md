@@ -55,6 +55,34 @@ The CPU needs a fast place to write down numbers while working on them. This mod
 - **Function:** It allows the CPU to read two numbers at the same time (to add them) and write one new result back.
 - **Challenge:** You must ensure you only write data when the `Write Enable` signal is ON.
 
+## 📝 Assignment 2: The Register File
+
+**Objective:** Create a module named `regfile` in `src/regfile.v`.
+
+**Concept:**
+This is the CPU's short-term memory. It contains **8 registers** (numbered 0 to 7).
+- It has **two read ports** (A and B), so the ALU can request two numbers at once.
+- It has **one write port**, so we can save a result back to a register.
+- **Important:** Reading happens instantly (Asynchronous). Writing happens ONLY on the rising edge of the clock (Synchronous) and ONLY if `write_enable` is 1.
+
+### Port Definitions
+| Direction | Name | Width | Description |
+| :--- | :--- | :--- | :--- |
+| Input | `clk` | 1-bit | Clock signal |
+| Input | `reset` | 1-bit | Synchronous Reset (Sets all registers to 0) |
+| Input | `we` | 1-bit | Write Enable (1 = Allow writing, 0 = Read only) |
+| Input | `r_addr_a` | 3-bit | Address for Read Port A (Selects R0-R7) |
+| Input | `r_addr_b` | 3-bit | Address for Read Port B (Selects R0-R7) |
+| Input | `w_addr` | 3-bit | Address to write data into |
+| Input | `w_data` | 8-bit | The data to save |
+| Output | `r_data_a` | 8-bit | Output data from Port A |
+| Output | `r_data_b` | 8-bit | Output data from Port B |
+
+### Implementation Details
+- Define the memory as an array: `reg [7:0] registers [0:7];`
+- **Reset:** If `reset` is high, loop through all 8 registers and set them to 0.
+- **Write:** If `we` is high (and not reset), write `w_data` into `registers[w_addr]`.
+
 ### 3. The Program Counter (PC)
 **The "Finger on the Page"** ☝️
 As a computer runs a program, it needs to know which line of code it is currently reading. The PC is simply a counter that holds the memory address of the *current* instruction.
