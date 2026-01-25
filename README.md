@@ -89,6 +89,32 @@ As a computer runs a program, it needs to know which line of code it is currentl
 - **Normal Operation:** Increments by 1 every clock cycle (`PC = PC + 1`).
 - **Jumps:** To loop or skip code, we force the PC to a specific number (`PC = Target`).
 
+## 📝 Assignment 3: The Program Counter (PC)
+
+**Objective:** Create a module named `pc` in `src/pc.v`.
+
+**Concept:**
+The PC tells the computer which line of code to run next.
+- **Normal Mode:** It acts like a standard counter. If we are at line 5, the next line is 6.
+- **Jump Mode:** Sometimes we need to "GOTO" a specific line (like in a loop or function call). If the `jump_en` signal is ON, the PC stops counting and forces itself to a new number provided by the input.
+
+**Simplification Note:** To keep this project easy, our PC will be **8-bit**. This means our computer can only have 256 lines of code maximum (Addresses 0 to 255). Real CPUs usually have 32-bit or 64-bit PCs.
+
+### Port Definitions
+| Direction | Name | Width | Description |
+| :--- | :--- | :--- | :--- |
+| Input | `clk` | 1-bit | Clock signal |
+| Input | `reset` | 1-bit | Synchronous Reset (Sets PC to 0) |
+| Input | `jump_en` | 1-bit | Jump Enable (1 = Load new address, 0 = Count up) |
+| Input | `jump_addr`| 8-bit | The target address to jump to |
+| Output | `pc_out` | 8-bit | The current instruction address |
+
+### Implementation Details
+- On the rising edge of `clk`:
+    1. If `reset` is 1, `pc_out` becomes 0.
+    2. Else if `jump_en` is 1, `pc_out` becomes `jump_addr`.
+    3. Else, `pc_out` becomes `pc_out + 1`.
+
 ### 4. Instruction Memory
 **The "Instruction Manual"** 📖
 This is where the program code lives. The CPU asks for the instruction at a specific address (provided by the PC), and this memory block sends back the raw binary code (machine code) for that instruction.
