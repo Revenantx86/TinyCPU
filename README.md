@@ -55,7 +55,7 @@ The CPU needs a fast place to write down numbers while working on them. This mod
 - **Function:** It allows the CPU to read two numbers at the same time (to add them) and write one new result back.
 - **Challenge:** You must ensure you only write data when the `Write Enable` signal is ON.
 
-## 📝 Assignment 2: The Register File
+### 📝 Assignment 2: The Register File
 
 **Objective:** Create a module named `regfile` in `src/regfile.v`.
 
@@ -89,7 +89,7 @@ As a computer runs a program, it needs to know which line of code it is currentl
 - **Normal Operation:** Increments by 1 every clock cycle (`PC = PC + 1`).
 - **Jumps:** To loop or skip code, we force the PC to a specific number (`PC = Target`).
 
-## 📝 Assignment 3: The Program Counter (PC)
+### 📝 Assignment 3: The Program Counter (PC)
 
 **Objective:** Create a module named `pc` in `src/pc.v`.
 
@@ -119,11 +119,75 @@ The PC tells the computer which line of code to run next.
 **The "Instruction Manual"** 📖
 This is where the program code lives. The CPU asks for the instruction at a specific address (provided by the PC), and this memory block sends back the raw binary code (machine code) for that instruction.
 
+
+### 📝 Assignment 4: Instruction Memory (ROM)
+
+**Objective:** Create a module named `inst_mem` in `src/inst_mem.v`.
+
+**Concept:**
+This is the "Book" the CPU reads. The **Address** comes from the PC, and the **Data** is the specific instruction at that line.
+- **Read-Only:** The CPU cannot change the code while running.
+- **Loading:** The memory needs to load a program from a file (e.g., `program.hex`) when the simulation starts.
+
+### Port Definitions
+| Direction | Name | Width | Description |
+| :--- | :--- | :--- | :--- |
+| Input | `address` | 8-bit | The line number to read (from PC) |
+| Output | `instruction` | 16-bit | The command at that line |
+
+### Implementation Details
+1.  Define the memory array: `reg [15:0] memory [0:255];`
+2.  **The Combinational Read:** `assign instruction = memory[address];` (ROM is usually instant in simple models).
+3.  **The Loader:** Use an `initial` block to load the file:
+    ```verilog
+    initial begin
+        $readmemh("program.hex", memory);
+    end
+    ```
+
 ### 5. The Control Unit
 **The "Brain"** 🧠
 This is the manager. It looks at the binary code coming from Memory and figures out what to do.
 - **Logic:** If it sees binary `0010`, it decides: *"Okay, that is an ADD instruction. I need to turn on the ALU, select Register 1 and Register 2, and tell the Register File to save the answer."*
 - **Output:** It sends control signals (wires) to all other blocks to coordinate them.
+
+### 📝 Assignment 5: The Control Unit (The Decoder)
+
+**Objective:** Create a module named `control_unit` in `src/control_unit.v`.
+
+**Concept:**
+This module is the manager. It takes the 16-bit instruction from memory, chops it up, and turns on the correct switches in the rest of the CPU.
+
+### The Instruction Format (16-bit)
+We will interpret the 16 bits like this:
+`[15:12] Opcode` | `[11:9] Dest Reg` | `[8:6] Src Reg A` | `[5:3] Src Reg B` | `[2:0] Unused`
+
+*Note: For "Immediate" instructions (like loading a number), we use the bottom 8 bits `[7:0]` as the value.*
+
+### Port Definitions
+| Direction | Name | Width | Description |
+| :--- | :--- | :--- | :--- |
+| Input | `instruction` | 16-bit | The raw instruction from memory |
+| Output | `alu_op` | 3-bit | Tells ALU what to do (matches opcode) |
+| Output | `reg_we` | 1-bit | 1 = Write to Register File, 0 = Don't write |
+| Output | `reg_w_addr` | 3-bit | Which register to write to (`inst[11:9]`) |
+| Output | `reg_r_addr_a` | 3-bit | Read Address A (`inst[8:6]`) |
+| Output | `reg_r_addr_b` | 3-bit | Read Address B (`inst[5:3]`) |
+| Output | `imm_val` | 8-bit | The Immediate Value (extracted from `inst[7:0]`) |
+| Output | `imm_sel` | 1-bit | 1 = Use Immediate Value, 0 = Use ALU Result |
+| Output | `jump_en` | 1-bit | 1 = Jump to Address, 0 = Normal Count |
+
+### The Opcode Map (The Brain Logic)
+You must implement a `case` statement on `instruction[15:12]`:
+
+| Opcode (Hex) | Mnemonic | Behavior | Signals to Set |
+| :--- | :--- | :--- | :--- |
+| **0 - 7** | **ALU Ops** | `Dest = A op B` | `reg_we=1`, `imm_sel=0`, `jump_en=0`, `alu_op=Opcode[2:0]` |
+| **8** | **LI** (Load Imm) | `Dest = Imm` | `reg_we=1`, `imm_sel=1`, `jump_en=0` |
+| **9** | **JMP** (Jump) | `PC = Imm` | `reg_we=0`, `jump_en=1`, `imm_val` acts as address |
+| **Default** | **NOP** | Do nothing | `reg_we=0`, `jump_en=0` |
+
+---
 
 ---
 
