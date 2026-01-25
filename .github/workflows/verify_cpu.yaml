@@ -1,0 +1,30 @@
+name: Verify CPU Design
+
+on: [push, pull_request]
+
+jobs:
+  rtl_simulation:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # 2. Install the Simulator (Icarus Verilog)
+      - name: Install Icarus Verilog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog
+
+      # 3. Compile the Design
+      # This checks for syntax errors. If this fails, the action stops here.
+      - name: Compile Verilog
+        run: |
+          iverilog -o cpu_sim -g2012 src/*.v tb/*.v
+
+      # 4. Run the Simulation
+      # This executes the compiled simulation.
+      - name: Run Testbench
+        run: |
+          vvp cpu_sim
