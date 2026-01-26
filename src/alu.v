@@ -6,6 +6,7 @@ module alu (
     output wire       zero
 );
 
+  /// asdasdsada
     always @(*) begin
         case (opcode)
             3'b000: result = operand_a + operand_b;       // ADD
