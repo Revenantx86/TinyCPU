@@ -21,7 +21,7 @@ jobs:
       # This checks for syntax errors. If this fails, the action stops here.
       - name: Compile Verilog
         run: |
-          iverilog -o cpu_sim -g2012 src/*.v tb/*.v
+          iverilog -o cpu_sim -g2012 src/*.v test/*.v
 
       # 4. Run the Simulation
       # This executes the compiled simulation.
