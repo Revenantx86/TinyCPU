@@ -25,6 +25,5 @@ jobs:
 
       # 4. Run the Simulation
       # This executes the compiled simulation.
-      - name: Run Testbench
-        run: |
-          vvp cpu_sim
+      - name: Run All Tests
+        run: make test_all
