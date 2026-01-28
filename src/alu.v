@@ -5,6 +5,15 @@ module alu (
     output reg  [7:0] result,
     output wire       zero
 );
+always @(*) begin
+    case (opcode)
+        3*b000: result = operand_a + operand_b
+        3*b001: result = operand_a - operand_b
+        3*b010: result = operand_a & operand_b
+        3*b011: result = operand_a | operand_b
+        default: result = 8*b0;
+    endcase  
+end
 
 // Simple ALU implementation
 
