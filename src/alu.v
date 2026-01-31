@@ -11,6 +11,10 @@ always @(*) begin
         3'b001: result = operand_a - operand_b;
         3'b010: result = operand_a & operand_b;
         3'b011: result = operand_a | operand_b;
+        3'b100: result = operand_a ^ operand_b;
+        3'b101: result = ~operand_a;
+        3'b110: result = operand_a << 1;
+        3'b111: result = operand_a >>1;
         default: result = 8'b0;
     endcase  
 end
